@@ -10,6 +10,8 @@ public class TestSort {
 			test[i] = (int) copy[i];
 		}
 
+		test = CountSort.sort(test, 1, test.length, 9);
+
 		for (int t : test) System.out.print( t + " ");
 		System.out.println();
 	}
