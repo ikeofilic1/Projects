@@ -26,6 +26,7 @@
 
 static unsigned char tape[SIZE] = {}; 
 int idx;
+//vector<int> ends;
 
 using namespace std;
 
@@ -63,6 +64,7 @@ bool pseudo_compile(vector<unsigned char>& vec) {
     char c;
     int count = 0, ln = 1, sz = vec.size(), i = 0;
     string str;
+    //ends.reserve(sz/3);
 
     while (i < sz) {
         c = vec[i++];
@@ -78,6 +80,7 @@ bool pseudo_compile(vector<unsigned char>& vec) {
                 return false; 
             }            
             --count;
+            //ends.push_back(i);
         }
         else if (c == '\n') {
             str.clear(), ++ln;
@@ -94,8 +97,9 @@ bool pseudo_compile(vector<unsigned char>& vec) {
 }
 
 void begin(vector<unsigned char>& src, istream& in) {
-    int ptr = 0, sz = src.size();
+    int ptr = 0, sz = src.size(); //endptr = ends.size()-1;
     char c;
+    vector<int> st(sz/3);
     while (ptr < sz) {
         c = src[ptr++];
         switch (c) {
@@ -126,63 +130,7 @@ void begin(vector<unsigned char>& src, istream& in) {
             case '[':
             {
                 if (!tape[idx]) {
-                    char c; int count = 1;
-                    while(count) {
-                        c = src[ptr++];
-                        if (c == '[') ++count;
-                        else if (c == ']') --count;
-                    }
-                }                
-            }
-            break;
-            case ']':
-                if (!tape[idx]) continue; 
-                char c; int count = -1;
-
-                do {
-                    --ptr;
-                    c = src[ptr-1];
-                    if (c == '[') ++count;
-                    else if (c == ']') --count;
-                } while(count);                
-        }
-    }
-}
-
-void begin2(vector<unsigned char>& src, istream& in) {
-    int ptr = 0, sz = src.size();
-    char c;
-    vector<int> st(sz>>2);
-    while (ptr < sz) {
-        c = src[ptr++];
-        switch (c) {
-            case '>' :
-                ++idx;
-                if (idx == SIZE) 
-                    idx = 0;
-                break;
-            case '<' :
-                if (!idx) 
-                    idx = SIZE;
-                --idx;
-                break;
-            case '+':
-                ++tape[idx];
-                break;
-            case '-':
-                --tape[idx];
-                break;
-            case '.': 
-                cout << tape[idx]; //change to use compile switch
-                break;                
-            case ',':
-                //if (in.rdbuf() == std::cin.rdbuf()) cout << "> "; //if I use a buffer
-                if (in.eof()) tape[idx] = 0; //for cat
-                else in.get((char&)tape[idx]);
-                break;
-            case '[':
-            {
-                if (!tape[idx]) {
+                    //ptr = ends[endptr--]; //or map
                     char c; int count = 1;
                     while(count) {
                         c = src[ptr++];
@@ -244,16 +192,14 @@ int main(int argc, char const *argv[]) {
     if (in == &cin) 
         cout << "Type CTRL-'d'(Linux ) or CTRL - 'z' (Windows & Unix) to exit if done" << endl;
     memset(tape, 0, sizeof(tape));
-    // cout << "**Unget version - vector**\n";
-    // begin(v, *in);
+    cout << "**Unget version - vector**\n";
+    begin(v, *in);
 
-    cout << "**Stack version - vector**\n";
-    begin2(v, *in);
-    /*FILE *fp = fopen("log.txt", "w");
+    FILE *fp = fopen("log.txt", "w");
     for (int i = 0; i < SIZE; ++i) {
         fprintf(fp, "%03d ", tape[i]);
     }
-    fclose(fp);*/
+    fclose(fp);
     cout << endl;
     return 0;
 }
