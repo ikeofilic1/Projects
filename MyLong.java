@@ -2,7 +2,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 class MyLong {
-    private Long value;
     
     public long smallestNumber(long num) {
         boolean neg = false;
